@@ -1,0 +1,46 @@
+// https://api.openweathermap.org/data/2.5/weather?q=Jakarta&units=metric&appid=a39269277452be55934cf7adc44c6985
+
+{
+    "coord": {
+        "lon": 108.5283,
+        "lat": -7.1277
+    },
+    "weather": [
+        {
+            "id": 803,
+            "main": "Clouds",
+            "description": "broken clouds",
+            "icon": "04d"
+        }
+    ],
+    "base": "stations",
+    "main": {
+        "temp": 31.04,
+        "feels_like": 32.11,
+        "temp_min": 31.04,
+        "temp_max": 31.04,
+        "pressure": 1010,
+        "humidity": 47,
+        "sea_level": 1010,
+        "grnd_level": 976
+    },
+    "visibility": 10000,
+    "wind": {
+        "speed": 2.87,
+        "deg": 164,
+        "gust": 3.09
+    },
+    "clouds": {
+        "all": 63
+    },
+    "dt": 1685512511,
+    "sys": {
+        "country": "ID",
+        "sunrise": 1685487091,
+        "sunset": 1685529346
+    },
+    "timezone": 25200,
+    "id": 1626443,
+    "name": "Subang",
+    "cod": 200
+}
