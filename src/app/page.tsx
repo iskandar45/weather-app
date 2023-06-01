@@ -1,45 +1,116 @@
 "use client"
-import City from "@/components/City"
-import Details from "@/components/Details"
 import axios from "axios"
-import { useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
+
+interface WeatherData {
+  name: string
+  weather: {
+    main: string
+    description: string
+  }[]
+  main: {
+    temp: number
+    feels_like: number
+    humidity: number
+  }
+  wind: {
+    speed: number
+  }
+  clouds: {
+    all: number
+  }
+  dt: number
+}
 
 export default function Home() {
-  const [query, setQuery] = useState("jakarta")
-  const [weatherData, setWeatherData] = useState(null)
-  const api_key = "a39269277452be55934cf7adc44c6985"
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}&units=metric&appid=${api_key}`
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
+  const [city, setCity] = useState("subang")
+  const [isLoading, setIsLoading] = useState(true)
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=a39269277452be55934cf7adc44c6985`
+
+  const timestampToDate = (timestamp: number) => {
+    const date = new Date(timestamp * 1000)
+    return date.toLocaleString("en-GB")
+  }
+
+  const fetchData = () => {
+    setIsLoading(true)
+    axios
+      .get(url)
+      .then((res) => {
+        setWeatherData(res.data)
+        setIsLoading(false)
+      })
+      .catch((err) => {
+        console.log(err)
+        setIsLoading(false)
+      })
+  }
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(url)
-        setWeatherData(response.data)
-      } catch (error) {
-        console.error("Error fetching weather data:", error)
-        // handle error condition, e.g. show an error message to the user
-      }
-    }
-
     fetchData()
-    // console.log(weatherData)
-  }, [url])
+    setCity("")
+  }, [])
 
-  // ...
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setCity(event.target.value)
+  }
+
+  const handleKeyPress = (event: { key: string }) => {
+    if (event.key === "Enter") {
+      fetchData()
+      setCity("")
+    }
+  }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between">
-      <div className="container min-h-screen max-w-md flex justify-between flex-col">
-        <div className="self-center my-5 ">
-          <input
-            type="search"
-            placeholder="Enter the country name"
-            className="border rounded-xl border-slate-400 p-3 bg-transparent w-full"
-          />
-        </div>
-        <City data={weatherData} />
-        <Details data={weatherData} />
-      </div>
+    <main className="flex min-h-screen flex-col">
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <>
+          <div>
+            <input
+              placeholder="Enter the city"
+              value={city}
+              onChange={(e) => handleChange(e)}
+              onKeyPress={handleKeyPress}
+            />
+          </div>
+          {weatherData && (
+            <>
+              <div>
+                <h1>{weatherData.name}</h1>
+                <p>{weatherData.main.temp}°C</p>
+                <p>
+                  {weatherData.weather[0].main} ({weatherData.weather[0].description})
+                </p>
+              </div>
+              <div>
+                <div>
+                  <p>Feels Like</p>
+                  <p>{weatherData.main.feels_like}°C</p>
+                </div>
+                <div>
+                  <p>Humidity</p>
+                  <p>{weatherData.main.humidity}%</p>
+                </div>
+                <div>
+                  <p>Winds</p>
+                  <p>{weatherData.wind.speed} m/s</p>
+                </div>
+                <div>
+                  <p>Clouds</p>
+                  <p>{weatherData.clouds.all}%</p>
+                </div>
+              </div>
+              <div>
+                <p>Last update: {timestampToDate(weatherData.dt)}</p>
+              </div>
+            </>
+          )}
+        </>
+      )}
     </main>
   )
 }
